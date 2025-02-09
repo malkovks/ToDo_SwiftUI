@@ -10,7 +10,11 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack(alignment: .center) {
+            GradientBackgroundView()
+            Text("Settings View")
+                .foregroundStyle(.iron)
+        }
     }
 }
 

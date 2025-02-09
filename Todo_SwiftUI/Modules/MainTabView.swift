@@ -8,22 +8,7 @@
 import SwiftUI
 import SwiftData
 
-enum Tab {
-    case tasks
-    case statistics
-    case settings
-    
-    var icon: String {
-        switch self {
-        case .tasks:
-            return "list.bullet"
-        case .statistics:
-            return "chart.pie.bar"
-        case .settings:
-            return "gearshape"
-        }
-    }
-}
+
 
 struct MainTabView: View {
     @State private var selectedTab: Tab = .tasks
@@ -48,40 +33,28 @@ struct MainTabView: View {
                 StatisticsView().tag(Tab.statistics)
                 SettingsView().tag(Tab.settings)
             }
-            .ignoresSafeArea(.keyboard,edges: .bottom)
-            .modelContainer(sharedModelContainer)
+            
+            
+            HStack(spacing: 40) {
+                ForEach(Tab.allCases, id: \.self) { tab in
+                    TabButton(tab: tab, selectedTab: $selectedTab)
+                }
+            }
+            .padding(.horizontal,20)
+            .padding(.vertical,10)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.midnight,.ocean]), startPoint: .leading, endPoint: .trailing)
+                    .clipShape(.capsule)
+                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                )
+            .padding(.bottom,10)
+            
         })
+        .ignoresSafeArea(.keyboard,edges: .bottom)
+        .modelContainer(sharedModelContainer)
     }
 }
 
 #Preview {
     return MainTabView()
-}
-
-struct TabButton: View {
-    let tab: Tab
-    @Binding var selectedTab: Tab
-    
-    var body: some View {
-        Button {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0)) {
-                selectedTab = tab
-            }
-        } label: {
-            Image(systemName: tab.icon)
-                .font(.system(size: selectedTab == tab ? 24 : 20,weight: .bold))
-                .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.7))
-                .padding()
-                .background(
-                    selectedTab == tab ?
-                    Circle()
-                        .fill(Color.white.opacity(0.2))
-                        .scaleEffect(1.1)
-                        .shadow(color: .black, radius: 5, x: 0, y: 3)
-                    : nil
-                    )
-                .scaleEffect(selectedTab == tab ? 1.2 : 1)
-                    
-        }
-    }
 }

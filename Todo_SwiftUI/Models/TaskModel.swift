@@ -19,8 +19,16 @@ struct TaskModel: Identifiable {
     var place: CLLocationCoordinate2D? = nil
     var creationDate: Date = Date()
     var notificationDate: Date? = nil
+    
+    static func mockData() -> [Self] {
+        return [
+            TaskModel(title: "First title", category: "First category", importance: .medium),
+            TaskModel(title: "Second title", category: "Second category", importance: .low),
+            TaskModel(title: "Third title", category: "Third category", importance: .high),
+            TaskModel(title: "Fourth title", category: "Fourth category", importance: .medium),
+            TaskModel(title: "Fifth title", category: "Fifth category", importance: .low),
+        ]
+    }
 }
 
-enum TaskImportance {
-    case high, medium, low
-}
+
