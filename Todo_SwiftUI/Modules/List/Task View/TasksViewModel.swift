@@ -14,6 +14,7 @@ class TasksViewModel: ObservableObject {
     var isEditing: Bool = false
     var showingAlert: Bool = false
     var selectedTasks: Set<UUID> = []
+    var showTaskCreateView: Bool = false
     
     func toggleTaskSelection(_ id: UUID){
         if selectedTasks.contains(id){
@@ -28,6 +29,12 @@ class TasksViewModel: ObservableObject {
             withAnimation(.bouncy) {
                 self.tasks[index].isCompleted.toggle()
             }
+        }
+    }
+    
+    func addTask(_ task: TaskModel){
+        withAnimation(.bouncy) {
+            tasks.append(task)
         }
     }
     

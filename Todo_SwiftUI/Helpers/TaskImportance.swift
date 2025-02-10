@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-enum TaskImportance {
+enum TaskImportance: CaseIterable {
+    var id: Self { self }
+    
     case high, medium, low
     
     var color: Color {
@@ -29,6 +31,17 @@ enum TaskImportance {
             return "Medium"
         case .low:
             return "Low"
+        }
+    }
+    
+    var imagePriority: String {
+        switch self {
+        case .high:
+            return "exclamationmark.3"
+        case .medium:
+            return "exclamationmark.2"
+        case .low:
+            return "exclamationmark"
         }
     }
 }

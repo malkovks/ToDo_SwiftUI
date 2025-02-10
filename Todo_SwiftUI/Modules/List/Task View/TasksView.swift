@@ -19,13 +19,7 @@ struct TasksView: View {
             ZStack(alignment: .top) {
                 GradientBackgroundView()
                 VStack(spacing: 10) {
-                    Text("Tasks")
-                        .font(.largeTitle.bold())
-                        .foregroundStyle(.silver)
-                        .frame(maxWidth: .infinity,alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top,10)
-                    
+                    TitleName(name: "Tasks")
                     if viewModel.tasks.isEmpty {
                         Text("Press + to add new items")
                             .font(.title)
@@ -66,9 +60,7 @@ struct TasksView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        //Добавить  ссылку на следующий контроллер для создания новой задачи
-//                        viewModel.addTask()
-                        viewModel.isEditing ? viewModel.deleteTasks() : viewModel.showingAlert.toggle()
+                        viewModel.isEditing ?  viewModel.showingAlert.toggle() : (viewModel.showTaskCreateView = true)
                     } label: {
                         Image(systemName: viewModel.isEditing ? "trash" : "plus")
                             .tint(viewModel.isEditing ? .red : .silver)
@@ -79,6 +71,12 @@ struct TasksView: View {
 
                 }
             }
+            .sheet(isPresented: $viewModel.showTaskCreateView, content: {
+                TaskCreateView { newTask in
+                    viewModel.addTask(newTask)
+                }
+            })
+            
             .alert(isPresented: $viewModel.showingAlert) {
                 Alert(title: Text("Warning"),
                       message: Text("Do you want to delete selected tasks?"),
