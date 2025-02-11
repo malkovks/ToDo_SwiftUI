@@ -23,7 +23,7 @@ struct SectionView<Content: View>: View {
         }
         
         .shadow(radius: 8)
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(.silver)
         .clipShape(.rect(cornerRadius: 12))
         .padding(.horizontal, 12)
     }

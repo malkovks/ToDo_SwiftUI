@@ -15,6 +15,7 @@ struct Todo_SwiftUIApp: App {
     var body: some Scene {
         WindowGroup {
             LoaderView()
+                .colorScheme(.dark)
         }
     }
 }

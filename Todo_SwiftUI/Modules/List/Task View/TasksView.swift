@@ -10,12 +10,14 @@ import SwiftUI
 
 struct TasksView: View {
     @StateObject private var viewModel = TasksViewModel()
+    @Binding var isTabBarVisible: Bool
     
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(),spacing: 16), count: 2)
     
     
     var body: some View {
         NavigationView {
+            
             ZStack(alignment: .top) {
                 GradientBackgroundView()
                 VStack(spacing: 10) {
@@ -41,6 +43,7 @@ struct TasksView: View {
                     }
                 }
             }
+            .toolbarVisibility(.hidden, for: .tabBar)
             .toolbarRole(.editor)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -57,10 +60,10 @@ struct TasksView: View {
                     }
                 }
                 
-                
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         viewModel.isEditing ?  viewModel.showingAlert.toggle() : (viewModel.showTaskCreateView = true)
+                        
                     } label: {
                         Image(systemName: viewModel.isEditing ? "trash" : "plus")
                             .tint(viewModel.isEditing ? .red : .silver)
@@ -68,32 +71,29 @@ struct TasksView: View {
                             .font(.system(size: 24))
                     }
                     .disabled(viewModel.isEditing ? viewModel.selectedTasks.isEmpty : false)
-
+                    
+                    .alert(isPresented: $viewModel.showingAlert) {
+                        Alert(title: Text("Warning"),
+                              message: Text("Do you want to delete selected tasks?"),
+                              primaryButton: .destructive(Text("Delete"), action: {
+                            viewModel.deleteTasks()
+                        }),
+                              secondaryButton: .cancel(Text("Cancel"), action: {
+                            viewModel.showingAlert.toggle()
+                            viewModel.isEditing.toggle()
+                        }))
+                    }
                 }
             }
-            .sheet(isPresented: $viewModel.showTaskCreateView, content: {
-                TaskCreateView { newTask in
-                    viewModel.addTask(newTask)
+            .fullScreenCover(isPresented: $viewModel.showTaskCreateView) {
+                TaskCreateView { task in
+                    viewModel.addTask(task)
                 }
-            })
-            
-            .alert(isPresented: $viewModel.showingAlert) {
-                Alert(title: Text("Warning"),
-                      message: Text("Do you want to delete selected tasks?"),
-                      primaryButton: .destructive(Text("Delete"), action: {
-                    viewModel.deleteTasks()
-                }),
-                      secondaryButton: .cancel(Text("Cancel"), action: {
-                    viewModel.showingAlert.toggle()
-                    viewModel.isEditing.toggle()
-                }))
+                .transition(.slide.animation(.easeInOut))
             }
         }
+        .onAppear {
+            isTabBarVisible = true
+        }
     }
-}
-
-
-
-#Preview {
-    TasksView()
 }

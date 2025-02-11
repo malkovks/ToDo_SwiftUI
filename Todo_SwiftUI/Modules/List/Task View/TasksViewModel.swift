@@ -10,11 +10,15 @@ import SwiftUI
 
 @Observable
 class TasksViewModel: ObservableObject {
-    var tasks: [TaskModel] = TaskModel.mockData()
+    var tasks: [TaskModel] = []
     var isEditing: Bool = false
     var showingAlert: Bool = false
     var selectedTasks: Set<UUID> = []
     var showTaskCreateView: Bool = false
+    
+    init(){
+        tasks = TaskModel.mockData()
+    }
     
     func toggleTaskSelection(_ id: UUID){
         if selectedTasks.contains(id){
@@ -42,6 +46,13 @@ class TasksViewModel: ObservableObject {
         withAnimation(.interactiveSpring) {
             tasks.append(TaskModel(title: title, category: category, importance: priority))
         }
+    }
+    
+    func updateTask(_ task: TaskModel){
+        tasks.removeAll(where: { $0.id == task.id })
+        tasks.append(task)
+        
+        print("Task updated")
     }
     
     func deleteTasks(){

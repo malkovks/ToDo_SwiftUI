@@ -7,34 +7,32 @@
 
 import SwiftUI
 
+import UIKit
+
 struct LoaderView: View {
     @StateObject private var viewModel: LoaderViewModel = .init()
     
     var body: some View {
-        if viewModel.isActive {
-            MainTabView()
-                .transition(.opacity.combined(with: .scale(0.95, anchor: .center)))
-        } else {
-            ZStack(alignment: .center, content: {
-                GradientBackgroundView()
+        ZStack {
+            GradientBackgroundView()
+            
+            if viewModel.isActive {
+                MainTabView()
+                    .transition(.opacity.combined(with: .scale))
+                    .animation(.easeInOut(duration: 1.0), value: viewModel.isActive)
+            } else {
                 LoaderIndicatorView(progress: viewModel.progress)
-                .onAppear {
-                    viewModel.startLoading {
-                        withAnimation(.easeInOut(duration: 1.0)) {
-                            viewModel.isActive = true
+                    .onAppear {
+                        viewModel.startLoading {
+                            withAnimation(.easeInOut(duration: 1.0)) {
+                                viewModel.isActive = true
+                            }
+                            let generator = UIImpactFeedbackGenerator(style: .soft)
+                            generator.impactOccurred()
                         }
                     }
-                }
-            })
+            }
         }
-    }
-}
-
-struct GradientBackgroundView: View {
-    var body: some View {
-        Color.iron.ignoresSafeArea(.all)
-        LinearGradient(colors: [.black.opacity(1),.black.opacity(0.8),.black.opacity(0.6),.black.opacity(0.4),.black.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
-            .edgesIgnoringSafeArea(.all)
     }
 }
 

@@ -10,7 +10,17 @@ import SwiftUI
 
 struct TaskCreateView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = TaskCreateViewModel()
+    @State private var viewModel: TaskCreateViewModel
+    
+    init(taskModel: TaskModel? = nil, onSave: @escaping (_ task: TaskModel) -> Void){
+        if let taskModel = taskModel {
+            viewModel = TaskCreateViewModel(taskModel: taskModel)
+        } else {
+            let newTask = TaskModel(title: "", category: "", importance: .medium)
+            viewModel = TaskCreateViewModel(taskModel: newTask)
+        }
+        self.onSave = onSave
+    }
     
     var onSave: (_ task: TaskModel) -> Void
     
@@ -24,10 +34,10 @@ struct TaskCreateView: View {
                     TitleName(name: "New Task")
                     ScrollView {
                         LazyVGrid(columns: column, spacing: 16) {
-                            SectionView(title: "TaskName") {
+                            SectionView(title: "Task Name") {
                                 FormRowView(title: "Enter name") {
                                     RowTextField(placeholder: "Enter name", text: $viewModel.title)
-                                        
+                                    
                                 }
                             }
                             SectionView(title: "Category and task priority") {
@@ -63,6 +73,13 @@ struct TaskCreateView: View {
                                 }
                             }
                             
+                            SectionView(title: "URL(optional)") {
+                                FormRowView(title: "Add Link") {
+                                    RowTextField(placeholder: "URL", text: $viewModel.link)
+                                }
+                            }
+                            //Add section with selection location on map
+                            
                             SectionView(title: "Photo") {
                                 FormRowView(title: "Add Photo") {
                                     Toggle("", isOn: $viewModel.isPhotoOn)
@@ -73,32 +90,73 @@ struct TaskCreateView: View {
                                     withAnimation(.easeInOut(duration: 2)) {
                                         FormRowView(title: "Choose Photo") {
                                             Button {
-                                                viewModel.showPhotoPicker = true
+                                                viewModel.showTypesImages = true
                                             } label: {
                                                 Image(systemName: "photo.on.rectangle.fill")
                                                     .tint(.black)
                                             }
                                         }
                                     }
+                                    FormImageView(image: viewModel.selectedImage)
                                 }
-                                FormImageView(image: viewModel.selectedImage)
+                                
                             }
                         }
-                        Button {
-                            onSave(viewModel.createNewTask())
-                            dismiss()
-                        } label: {
-                            Image(systemName: "trash")
+                        HStack(spacing: 20) {
+                            Button {
+                                
+                                onSave(viewModel.createNewTask())
+                                dismiss()
+                            } label: {
+                                Label("Save New Task", systemImage: "plus.circle.fill")
+                                    .imageScale(.large)
+                                    .tint(.black)
+                            }
+                            .frame(maxWidth: .infinity,alignment: .center)
+                            .frame(height: 50)
+                            .background(.silver)
+                            .clipShape(.rect(cornerRadius: 12))
+                            .padding(12)
                         }
-                        .frame(maxWidth: .infinity,alignment: .center)
-                        .padding(.vertical,12)
-                        .padding(.horizontal,12)
-                        .background(Color.red)
-                        
-
                     }
-                    .sheet(isPresented: $viewModel.showPhotoPicker) {
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                if viewModel.isDirty {
+                                    viewModel.showUnsavedChangesAlert = true
+                                } else {
+                                    dismiss()
+                                }
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .tint(.silver)
+                                    .imageScale(.large)
+                            }
+                        }
+                    }
+                    
+                    
+                    .fullScreenCover(isPresented: $viewModel.showPhotoPicker) {
                         PhotoPickerView(selectedImage: $viewModel.selectedImage)
+                    }
+                    .fullScreenCover(isPresented: $viewModel.showCameraController) {
+                        CameraPickerView(selectedImage: $viewModel.selectedImage)
+                    }
+                    .navigationBarBackButtonHidden(true)
+                    .alert("You have some unsaved changes. Are you sure you want to leave?", isPresented: $viewModel.showUnsavedChangesAlert) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("Leave anyway", role: .destructive) {
+                            dismiss()
+                        }
+                    }
+                    .confirmationDialog("Select image resource", isPresented: $viewModel.showTypesImages, titleVisibility: .visible) {
+                        Button("Camera") {
+                            viewModel.showCameraController = true
+                        }
+                        Button("Photo Library") {
+                            viewModel.showPhotoPicker = true
+                        }
+                        Button("Cancel", role: .cancel) {}
                     }
                 }
             }
@@ -106,23 +164,8 @@ struct TaskCreateView: View {
     }
 }
 
-struct FormImageView: View {
-    var image: UIImage?
-    
-    var body: some View {
-        if let image = image {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .frame(height: 150)
-                .clipShape(.rect(cornerRadius: 12))
-                .padding(.bottom, 12)
-        }
-    }
-}
+
 
 #Preview {
-    TaskCreateView { task in
-        print(task)
-    }
+    TaskCreateView(onSave: { _ in })
 }
