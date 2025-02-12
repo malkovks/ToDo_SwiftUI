@@ -9,7 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct TaskModel: Identifiable {
-    let id = UUID()
+    var id: UUID = UUID()
     var title: String
     var category: String
     var importance: TaskImportance
@@ -20,14 +20,37 @@ struct TaskModel: Identifiable {
     var creationDate: Date = Date()
     var notificationDate: Date? = nil
     
-    static func mockData() -> [Self] {
-        return [
-            TaskModel(title: "First title", category: "First category", importance: .medium),
-            TaskModel(title: "Second title", category: "Second category", importance: .low),
-            TaskModel(title: "Third title", category: "Third category", importance: .high),
-            TaskModel(title: "Fourth title", category: "Fourth category", importance: .medium),
-            TaskModel(title: "Fifth title", category: "Fifth category", importance: .low),
-        ]
+    init (title: String,
+          category: String,
+          importance: TaskImportance,
+          isCompleted: Bool = false,
+          image: Data? = nil,
+          link: URL? = nil,
+          place: CLLocationCoordinate2D? = nil,
+          creationDate: Date = Date(),
+          notificationDate: Date? = nil
+    ) {
+        self.title = title
+        self.category = category
+        self.importance = importance
+        self.isCompleted = isCompleted
+        self.image = image
+        self.link = link
+        self.place = place
+        self.creationDate = creationDate
+        self.notificationDate = notificationDate
+    }
+    
+    init(_ taskModel: Item){
+        self.id = taskModel.id
+        self.title = taskModel.title
+        self.category = taskModel.category
+        self.importance = TaskImportance(rawValue: taskModel.importance.capitalized) ?? .medium
+        self.isCompleted = taskModel.isCompleted
+        self.image = taskModel.image
+        self.link = taskModel.link
+        self.creationDate = taskModel.creationDate
+        self.notificationDate = taskModel.notificationDate
     }
 }
 

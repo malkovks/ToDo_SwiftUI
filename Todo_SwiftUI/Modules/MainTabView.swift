@@ -15,25 +15,19 @@ struct MainTabView: View {
     @State private var isTabBarVisible: Bool = true
     
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([Item.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
+        return try! ModelContainer(for: schema, configurations: [modelConfiguration])
     }()
     
     var body: some View {
         ZStack(alignment: .bottom, content: {
             TabView(selection: $selectedTab) {
-                TasksView(isTabBarVisible: $isTabBarVisible).tag(Tab.tasks)
+                TasksView(viewModel: TasksViewModel(sharedModelContainer.mainContext), isTabBarVisible: $isTabBarVisible).tag(Tab.tasks)
                 StatisticsView().tag(Tab.statistics)
                 SettingsView().tag(Tab.settings)
             }
+            .modelContainer(sharedModelContainer)
             
             if isTabBarVisible {
                 

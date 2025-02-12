@@ -11,7 +11,7 @@ struct HeaderTaskText: View {
     var text: String
     
     var body: some View {
-        Text(text.capitalized)
+        Text(text)
             .foregroundStyle(.silver)
             .padding(.leading,8)
             .font(.headline)

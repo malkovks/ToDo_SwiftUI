@@ -9,11 +9,12 @@
 import SwiftUI
 
 struct TasksView: View {
-    @StateObject private var viewModel = TasksViewModel()
+    @Environment(\.modelContext) private var modelContext
+    @State var viewModel: TasksViewModel
     @Binding var isTabBarVisible: Bool
     
-    private let columns: [GridItem] = Array(repeating: GridItem(.flexible(),spacing: 16), count: 2)
     
+    private let columns: [GridItem] = Array(repeating: GridItem(.flexible(),spacing: 16), count: 2)
     
     var body: some View {
         NavigationView {
@@ -34,7 +35,7 @@ struct TasksView: View {
                                     TaskCell(task: task, isEditing: viewModel.isEditing, isSelected: viewModel.selectedTasks.contains(task.id)) {
                                         viewModel.toggleTaskSelection(task.id)
                                     } completionAction: {
-                                        viewModel.completeTask(task.id)
+                                        viewModel.completeTask(with: task.id)
                                     }
                                 }
                             }

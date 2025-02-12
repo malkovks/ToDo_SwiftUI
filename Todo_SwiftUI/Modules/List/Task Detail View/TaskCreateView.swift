@@ -30,9 +30,11 @@ struct TaskCreateView: View {
         NavigationView {
             ZStack(alignment: .top) {
                 GradientBackgroundView()
+                
                 VStack {
-                    TitleName(name: "New Task")
+                    
                     ScrollView {
+                        TitleName(name: "New Task")
                         LazyVGrid(columns: column, spacing: 16) {
                             SectionView(title: "Task Name") {
                                 FormRowView(title: "Enter name") {
@@ -63,8 +65,8 @@ struct TaskCreateView: View {
                                 }
                                 if viewModel.isReminderOn {
                                     withAnimation(.easeInOut(duration: 2)) {
-                                        FormRowView(title: "Date Reminder") {
-                                            DatePicker("", selection: $viewModel.reminderDate,displayedComponents: .date)
+                                        FormRowView(title: "Reminder date") {
+                                            DatePicker("", selection: $viewModel.reminderDate, in: Date()...)
                                                 .labelsHidden()
                                                 .datePickerStyle(.compact)
                                                 .tint(.black)
@@ -73,12 +75,11 @@ struct TaskCreateView: View {
                                 }
                             }
                             
-                            SectionView(title: "URL(optional)") {
+                            SectionView(title: "URL") {
                                 FormRowView(title: "Add Link") {
-                                    RowTextField(placeholder: "URL", text: $viewModel.link)
+                                    RowTextField(placeholder: "Link", text: $viewModel.link)
                                 }
                             }
-                            //Add section with selection location on map
                             
                             SectionView(title: "Photo") {
                                 FormRowView(title: "Add Photo") {
@@ -104,7 +105,6 @@ struct TaskCreateView: View {
                         }
                         HStack(spacing: 20) {
                             Button {
-                                
                                 onSave(viewModel.createNewTask())
                                 dismiss()
                             } label: {

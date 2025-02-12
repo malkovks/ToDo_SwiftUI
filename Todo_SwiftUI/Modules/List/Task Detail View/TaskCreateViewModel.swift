@@ -11,17 +11,16 @@ import CoreLocation
 
 @Observable
 class TaskCreateViewModel: ObservableObject {
-    
-    var title: String = "" { didSet { isDirty = true } }
-    var category: String = "" { didSet { isDirty = true } }
-    var importance: TaskImportance = .medium { didSet { isDirty = true } }
-    var plannedDate: Date = Date() { didSet { isDirty = true } }
-    var isReminderOn: Bool = false { didSet { isDirty = true } }
-    var reminderDate: Date = Date() { didSet { isDirty = true } }
-    var isPhotoOn: Bool = false { didSet { isDirty = true } }
-    var selectedImage: UIImage? = nil { didSet { isDirty = true } }
-    var location: CLLocationCoordinate2D? = nil { didSet { isDirty = true } }
-    var link: String = "" { didSet { isDirty = true } }
+    var title: String { didSet { isDirty = true } }
+    var category: String  { didSet { isDirty = true } }
+    var importance: TaskImportance  { didSet { isDirty = true } }
+    var plannedDate: Date  { didSet { isDirty = true } }
+    var isReminderOn: Bool  { didSet { isDirty = true } }
+    var reminderDate: Date  { didSet { isDirty = true } }
+    var isPhotoOn: Bool  { didSet { isDirty = true } }
+    var selectedImage: UIImage?  { didSet { isDirty = true } }
+    var location: CLLocationCoordinate2D?  { didSet { isDirty = true } }
+    var link: String { didSet { isDirty = true } }
     
     var showPhotoPicker = false
     var showCameraController: Bool = false
@@ -38,6 +37,7 @@ class TaskCreateViewModel: ObservableObject {
         self.importance = taskModel.importance
         self.plannedDate = taskModel.creationDate
         self.isReminderOn = taskModel.notificationDate != nil
+        self.reminderDate = taskModel.notificationDate ?? Date()
         self.isPhotoOn = taskModel.image != nil
         self.location = taskModel.place
         self.link = taskModel.link?.absoluteString ?? ""
@@ -54,15 +54,6 @@ class TaskCreateViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func openPhotoPicker(){
-        photoManager.selectedImage = nil
-    }
-    
-    func openCamere(){
-        print("Open Camera")
-    }
-    
     func createNewTask() -> TaskModel {
         let image = isPhotoOn ? selectedImage : nil
         return TaskModel(title: title,
@@ -70,7 +61,7 @@ class TaskCreateViewModel: ObservableObject {
                          importance: importance,
                          isCompleted: false,
                          image: selectedImage != nil && isPhotoOn ? image!.jpegData(compressionQuality: 1.0) : nil,
-                         link: URL(string: link),
+                         link: URL(string: link)?.checkValidation(),
                          place: location,
                          creationDate: plannedDate,
                          notificationDate: isReminderOn ? reminderDate : nil)

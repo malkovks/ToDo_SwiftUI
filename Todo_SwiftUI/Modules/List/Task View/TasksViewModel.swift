@@ -7,17 +7,30 @@
 
 
 import SwiftUI
+import SwiftData
 
 @Observable
 class TasksViewModel: ObservableObject {
+    private let modelContext: ModelContext
+    
     var tasks: [TaskModel] = []
     var isEditing: Bool = false
     var showingAlert: Bool = false
     var selectedTasks: Set<UUID> = []
     var showTaskCreateView: Bool = false
     
-    init(){
-        tasks = TaskModel.mockData()
+    init(_ modelContext: ModelContext){
+        self.modelContext = modelContext
+        loadTasks()
+    }
+
+    func loadTasks(){
+        let fetchDescription = FetchDescriptor<Item>()
+        if let item = try? modelContext.fetch(fetchDescription) {
+            withAnimation {
+                self.tasks = item.map({ TaskModel($0) })
+            }
+        }
     }
     
     func toggleTaskSelection(_ id: UUID){
@@ -28,46 +41,51 @@ class TasksViewModel: ObservableObject {
         }
     }
     
-    func completeTask(_ id: UUID){
-        if let index = tasks.firstIndex(where: { $0.id == id }) {
-            withAnimation(.bouncy) {
-                self.tasks[index].isCompleted.toggle()
-            }
-        }
-    }
-    
     func addTask(_ task: TaskModel){
         withAnimation(.bouncy) {
-            tasks.append(task)
-        }
-    }
-    
-    func addTask(with title: String = "New Task",category: String = "Default",priority: TaskImportance = .medium){
-        withAnimation(.interactiveSpring) {
-            tasks.append(TaskModel(title: title, category: category, importance: priority))
+            let item = Item(task)
+            modelContext.insert(item)
+            try? modelContext.save()
+            self.loadTasks()
         }
     }
     
     func updateTask(_ task: TaskModel){
-        tasks.removeAll(where: { $0.id == task.id })
-        tasks.append(task)
-        
-        print("Task updated")
+        if let existedTask = try? modelContext.fetch(FetchDescriptor<Item>()).first(where: { $0.id == task.id }){
+            existedTask.title = task.title
+            existedTask.category = task.category
+            existedTask.importance = task.importance.rawValue
+            existedTask.isCompleted = task.isCompleted
+            existedTask.image = task.image
+            existedTask.link = task.link
+            existedTask.creationDate = task.creationDate
+            existedTask.notificationDate = task.notificationDate
+            
+            try? modelContext.save()
+            self.loadTasks()
+        }
     }
     
     func deleteTasks(){
-        
-        for task in tasks {
-            for selectedTask in selectedTasks {
-                if task.id == selectedTask {
-                    tasks.removeAll(where: { $0.id == selectedTask })
-                }
+        for selectedTask in selectedTasks {
+            if let item = try? modelContext.fetch(FetchDescriptor<Item>()).first(where: { $0.id == selectedTask }) {
+                modelContext.delete(item)
             }
         }
+        try? modelContext.save()
         withAnimation(.interpolatingSpring) {
             showingAlert = false
             isEditing = false
         }
-        
+        loadTasks()
+    }
+    
+    func completeTask(with id: UUID){
+        if let index = tasks.firstIndex(where: { $0.id == id }) {
+            withAnimation(.bouncy) {
+                tasks[index].isCompleted.toggle()
+                updateTask(tasks[index])
+            }
+        }
     }
 }

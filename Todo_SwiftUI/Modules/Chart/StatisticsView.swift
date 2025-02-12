@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct StatisticsView: View {
+    @Environment(\.modelContext) private var modelContext
     var body: some View {
         ZStack(alignment: .center) {
             GradientBackgroundView()

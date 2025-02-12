@@ -7,10 +7,23 @@
 
 import SwiftUI
 
-enum TaskImportance: CaseIterable {
+enum TaskImportance: String,CaseIterable {
     var id: Self { self }
     
     case high, medium, low
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case "High":
+            self = .high
+        case "Medium":
+            self = .medium
+        case "Low":
+            self = .low
+        default:
+            return nil
+        }
+    }
     
     var color: Color {
         switch self {
