@@ -17,7 +17,9 @@ class TasksViewModel: ObservableObject {
     var isEditing: Bool = false
     var showingAlert: Bool = false
     var selectedTasks: Set<UUID> = []
+    var selectedTask: TaskModel?
     var showTaskCreateView: Bool = false
+    var showEditTaskCreateView: Bool = false
     
     init(_ modelContext: ModelContext){
         self.modelContext = modelContext

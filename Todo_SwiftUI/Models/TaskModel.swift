@@ -19,6 +19,7 @@ struct TaskModel: Identifiable {
     var place: CLLocationCoordinate2D? = nil
     var creationDate: Date = Date()
     var notificationDate: Date? = nil
+    var addedToEvent: Bool = false
     
     init (title: String,
           category: String,
@@ -28,7 +29,8 @@ struct TaskModel: Identifiable {
           link: URL? = nil,
           place: CLLocationCoordinate2D? = nil,
           creationDate: Date = Date(),
-          notificationDate: Date? = nil
+          notificationDate: Date? = nil,
+          addedToEvent: Bool = false
     ) {
         self.title = title
         self.category = category
@@ -39,6 +41,7 @@ struct TaskModel: Identifiable {
         self.place = place
         self.creationDate = creationDate
         self.notificationDate = notificationDate
+        self.addedToEvent = addedToEvent
     }
     
     init(_ taskModel: Item){
@@ -51,6 +54,7 @@ struct TaskModel: Identifiable {
         self.link = taskModel.link
         self.creationDate = taskModel.creationDate
         self.notificationDate = taskModel.notificationDate
+        self.addedToEvent = taskModel.addedToEvent
     }
 }
 

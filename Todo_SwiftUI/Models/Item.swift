@@ -21,6 +21,7 @@ final class Item {
     var link: URL? = nil
     var creationDate: Date = Date()
     var notificationDate: Date? = nil
+    var addedToEvent: Bool = false
     
     init(_ taskModel: TaskModel){
         self.id = taskModel.id
@@ -32,5 +33,6 @@ final class Item {
         self.link = taskModel.link
         self.creationDate = taskModel.creationDate
         self.notificationDate = taskModel.notificationDate
+        self.addedToEvent = taskModel.addedToEvent
     }
 }

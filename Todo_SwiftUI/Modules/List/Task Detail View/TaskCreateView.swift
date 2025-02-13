@@ -14,10 +14,10 @@ struct TaskCreateView: View {
     
     init(taskModel: TaskModel? = nil, onSave: @escaping (_ task: TaskModel) -> Void){
         if let taskModel = taskModel {
-            viewModel = TaskCreateViewModel(taskModel: taskModel)
+            viewModel = TaskCreateViewModel(taskModel: taskModel, isDataEdited: true)
         } else {
             let newTask = TaskModel(title: "", category: "", importance: .medium)
-            viewModel = TaskCreateViewModel(taskModel: newTask)
+            viewModel = TaskCreateViewModel(taskModel: newTask, isDataEdited: false)
         }
         self.onSave = onSave
     }
@@ -37,13 +37,13 @@ struct TaskCreateView: View {
                         TitleName(name: "New Task")
                         LazyVGrid(columns: column, spacing: 16) {
                             SectionView(title: "Task Name") {
-                                FormRowView(title: "Enter name") {
+                                FormRowView(title: "") {
                                     RowTextField(placeholder: "Enter name", text: $viewModel.title)
                                     
                                 }
                             }
                             SectionView(title: "Category and task priority") {
-                                FormRowView(title: "Category") {
+                                FormRowView(title: "") {
                                     RowTextField(placeholder: "Enter the category", text: $viewModel.category)
                                 }
                                 FormRowView(title: "Priority") {
@@ -76,7 +76,7 @@ struct TaskCreateView: View {
                             }
                             
                             SectionView(title: "URL") {
-                                FormRowView(title: "Add Link") {
+                                FormRowView(title: "") {
                                     RowTextField(placeholder: "Link", text: $viewModel.link)
                                 }
                             }
@@ -100,15 +100,23 @@ struct TaskCreateView: View {
                                     }
                                     FormImageView(image: viewModel.selectedImage)
                                 }
-                                
+                            }
+                            
+                            SectionView(title: "Calendar") {
+                                FormRowView(title: "Add task to Calendar") {
+                                    CalendarToggleView(isShowCalendar: $viewModel.isAddToCalendar, isSelectedInfo: $viewModel.showsSavingToCalendar)
+                                }
                             }
                         }
+                        .disabled(!viewModel.isStartEditing && viewModel.isDataEdited)
                         HStack(spacing: 20) {
                             Button {
                                 onSave(viewModel.createNewTask())
+                                viewModel.addTaskToEvent()
+                                viewModel.scheduleNotificationIfNeeded()
                                 dismiss()
                             } label: {
-                                Label("Save New Task", systemImage: "plus.circle.fill")
+                                Label(viewModel.buttonText, systemImage: "plus.circle.fill")
                                     .imageScale(.large)
                                     .tint(.black)
                             }
@@ -117,21 +125,29 @@ struct TaskCreateView: View {
                             .background(.silver)
                             .clipShape(.rect(cornerRadius: 12))
                             .padding(12)
+                            .opacity(viewModel.isStartEditing ? 1 : 0)
                         }
                     }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
                             Button {
-                                if viewModel.isDirty {
-                                    viewModel.showUnsavedChangesAlert = true
-                                } else {
-                                    dismiss()
-                                }
+                                viewModel.isDirty ? (viewModel.showUnsavedChangesAlert.toggle()) : dismiss()
                             } label: {
                                 Image(systemName: "chevron.left")
                                     .tint(.silver)
                                     .imageScale(.large)
                             }
+                        }
+                        
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                viewModel.isStartEditing.toggle()
+                            } label: {
+                                Label("Edit", systemImage: "pencil.circle")
+                                    .tint(.aqua)
+                                    
+                            }
+                            .opacity(viewModel.isDataEdited ? 1 : 0)
                         }
                     }
                     
@@ -143,11 +159,11 @@ struct TaskCreateView: View {
                         CameraPickerView(selectedImage: $viewModel.selectedImage)
                     }
                     .navigationBarBackButtonHidden(true)
-                    .alert("You have some unsaved changes. Are you sure you want to leave?", isPresented: $viewModel.showUnsavedChangesAlert) {
-                        Button("Cancel", role: .cancel) {}
+                    .alert(viewModel.alertText, isPresented: $viewModel.showUnsavedChangesAlert) {
                         Button("Leave anyway", role: .destructive) {
                             dismiss()
                         }
+                        Button("Cancel", role: .cancel) {}
                     }
                     .confirmationDialog("Select image resource", isPresented: $viewModel.showTypesImages, titleVisibility: .visible) {
                         Button("Camera") {
@@ -158,14 +174,39 @@ struct TaskCreateView: View {
                         }
                         Button("Cancel", role: .cancel) {}
                     }
+                    .sheet(isPresented: $viewModel.showsSavingToCalendar) {
+                        InformationView()
+                            .presentationDetents([.fraction(0.3)])
+                            .presentationCornerRadius(15)
+                            .presentationDragIndicator(.visible)
+                    }
                 }
             }
         }
     }
 }
 
+struct CalendarToggleView: View {
+    @Binding var isShowCalendar: Bool
+    @Binding var isSelectedInfo: Bool
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Toggle("", isOn: $isShowCalendar)
+                .labelsHidden()
+                .tint(.black)
+            Button {
+                isSelectedInfo.toggle()
+            } label: {
+                Image(systemName: "info.circle")
+                    .tint(.black)
+                    .imageScale(.medium)
+            }
+        }
+    }
+}
 
 
 #Preview {
-    TaskCreateView(onSave: { _ in })
+    TaskCreateView(taskModel: nil,onSave: { _ in })
 }

@@ -37,6 +37,10 @@ struct TasksView: View {
                                     } completionAction: {
                                         viewModel.completeTask(with: task.id)
                                     }
+                                    .onTapGesture {
+                                        viewModel.selectedTask = task
+                                        viewModel.showEditTaskCreateView.toggle()
+                                    }
                                 }
                             }
                             .padding(.horizontal)
@@ -54,7 +58,7 @@ struct TasksView: View {
                         }
                     } label: {
                         Image(systemName: viewModel.isEditing ? "checkmark.circle" : "pencil.circle")
-                            .font(.title.bold())
+                            .fontWeight(.regular)
                             .foregroundStyle(.silver)
                             .frame(maxWidth: .infinity,alignment: .leading)
                             .padding(.horizontal)
@@ -68,7 +72,7 @@ struct TasksView: View {
                     } label: {
                         Image(systemName: viewModel.isEditing ? "trash" : "plus")
                             .tint(viewModel.isEditing ? .red : .silver)
-                            .fontWeight(.medium)
+                            .fontWeight(.regular)
                             .font(.system(size: 24))
                     }
                     .disabled(viewModel.isEditing ? viewModel.selectedTasks.isEmpty : false)
@@ -86,6 +90,15 @@ struct TasksView: View {
                     }
                 }
             }
+            .fullScreenCover(isPresented: $viewModel.showEditTaskCreateView, content: {
+                if let model = viewModel.selectedTask {
+                    TaskCreateView(taskModel: model) { task in
+                        viewModel.updateTask(task)
+                    }
+                    .transition(.slide.animation(.easeInOut))
+                }
+            })
+            
             .fullScreenCover(isPresented: $viewModel.showTaskCreateView) {
                 TaskCreateView { task in
                     viewModel.addTask(task)

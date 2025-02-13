@@ -19,29 +19,31 @@ struct RowTextField: View {
     
     var body: some View {
         HStack {
-            TextField(placeholder, text: $text)
-                .font(.title2)
-                .foregroundColor(.black)
-                .tint(.black)
-                .multilineTextAlignment(.trailing)
-                .padding(.horizontal)
-                .keyboardType(.asciiCapable)
-                .autocorrectionDisabled(true)
-                .submitLabel(.continue)
-                .textInputAutocapitalization(.never)
+            VStack {
+                TextField(placeholder, text: $text)
+                    .font(.title3)
+                    .foregroundColor(.black)
+                    .tint(.black)
+                    .multilineTextAlignment(.trailing)
+                    .padding(.horizontal)
+                    .keyboardType(.asciiCapable)
+                    .autocorrectionDisabled(true)
+                    .submitLabel(.continue)
+                    .textInputAutocapitalization(.never)
+                Rectangle()
+                    .frame(height: 1)
+                    .padding(.horizontal,10)
+            }
             if !text.isEmpty {
                 Image(systemName: "delete.left")
                     .foregroundColor(.gray)
                     .onTapGesture {
-                        text.removeLast()
+                        text.removeAll()
                     }
                 .padding(.trailing,10)
             }
         }
-        .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(.gray,lineWidth: 1)
-        }
+        
     }
 }
 
