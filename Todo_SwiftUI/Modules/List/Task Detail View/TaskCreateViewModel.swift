@@ -12,33 +12,25 @@ import CoreLocation
 @Observable
 class TaskCreateViewModel: ObservableObject {
     //MARK: - Reference properties
-    var title: String { didSet { isDirty = true } }
-    var category: String  { didSet { isDirty = true } }
-    var importance: TaskImportance  { didSet { isDirty = true } }
-    var plannedDate: Date  { didSet { isDirty = true } }
-    var reminderDate: Date  { didSet { isDirty = true } }
-    var isPhotoOn: Bool  { didSet { isDirty = true } }
-    var selectedImage: UIImage?  { didSet { isDirty = true } }
-    var link: String { didSet { isDirty = true } }
+    var title: String  = "" { didSet { isDirty = true } }
+    var category: String = "" { didSet { isDirty = true } }
+    var importance: TaskImportance = .medium  { didSet { isDirty = true } }
+    var plannedDate: Date = Date() { didSet { isDirty = true } }
+    var reminderDate: Date = Date() { didSet { isDirty = true } }
     
-    var isReminderOn: Bool  {
-        didSet {
-            isDirty = true
-            guard isReminderOn else { return }
-            NotificationManager.shared.requestAuthorization { isAccessed in
-                print("isAccessed for manager: \(isAccessed)")
-            }
-        }
-    }
+    var selectedImage: UIImage? = nil { didSet { isDirty = true } }
+    var link: String = "" { didSet { isDirty = true } }
     
-    var isAddToCalendar: Bool {
-        didSet {
-            guard isAddToCalendar else { return }
-            eventManager.requestAccess { granted, error in
-            }
-        }
-    }
+    var isPhotoOn: Bool = false { didSet { isDirty = true } }
+    var isReminderOn: Bool = false { didSet { isDirty = true } }
+    var isAddToCalendar: Bool = false
     
+    
+    //MARK: - Alerts flags
+    var showPhotoAlert: Bool = false
+    var showNotificationAlert: Bool = false
+    var showEventAlert: Bool = false
+    var showEmptyTitleAlert: Bool = false
     //MARK: - Flag properties
     
     var showPhotoPicker = false
@@ -47,46 +39,51 @@ class TaskCreateViewModel: ObservableObject {
     var showUnsavedChangesAlert: Bool = false
     var showsSavingToCalendar: Bool = false
     
-    
-    
     var isDirty: Bool = false
-    var isDataEdited: Bool
-    var isStartEditing: Bool = false
     
     private let photoManager = PhotoLibraryManager.shared
     private let eventManager = CalendarManager.shared
+    private let notificationManager = NotificationManager.shared
     private var notificationIdentifier: String?
     
-    var alertText: String {
-        isDataEdited ? "Dou you want to submit edits for your task?" : "You have some unsaved changes. Are you sure you want to leave?"
-    }
-    
-    var buttonText: String {
-        isDataEdited ? "Update current task" : "Save New Task"
-    }
-    
-    init(taskModel: TaskModel,isDataEdited: Bool){
-        self.isDataEdited = isDataEdited
-        self.title = taskModel.title
-        self.category = taskModel.category
-        self.importance = taskModel.importance
-        self.plannedDate = taskModel.creationDate
-        self.isReminderOn = taskModel.notificationDate != nil
-        self.reminderDate = taskModel.notificationDate ?? Date()
-        self.isPhotoOn = taskModel.image != nil
-        self.link = taskModel.link?.absoluteString ?? ""
-        self.isAddToCalendar = taskModel.addedToEvent
-        if let data = taskModel.image {
-            self.selectedImage = UIImage(data: data)
+    func toggleCalendarAccess(isOn: Bool){
+        if isOn {
+            eventManager.requestAccess { isAccessed, _ in
+                DispatchQueue.main.async {
+                    self.isAddToCalendar = isAccessed
+                    self.showEventAlert = !isAccessed
+                }
+            }
+        } else {
+            self.isAddToCalendar = false
         }
-        
     }
     
-    @MainActor
-    func saveImage(){
-        guard let image = selectedImage else { return }
-        photoManager.saveImageTolibrary(image) { isSuccess in
-            print("Image saved: \(isSuccess)")
+    func toggleNotificationAccess(isOn: Bool){
+        if isOn {
+            notificationManager.requestAuthorization { isAccessed in
+                DispatchQueue.main.async {
+                    self.isReminderOn = isAccessed
+                    self.showNotificationAlert = !isAccessed
+                }
+            }
+        } else {
+            self.isReminderOn = false
+        }
+    }
+    
+    func togglePhotoAccess(isOn: Bool){
+        if isOn {
+            photoManager.checkAuthorizationStatus { [weak self] isSuccess in
+                DispatchQueue.main.async {
+                    self?.isPhotoOn = isSuccess
+                    self?.showPhotoAlert = !isSuccess
+                }
+            }
+        } else {
+            withAnimation {
+                isPhotoOn = false
+            }
         }
     }
     
@@ -99,12 +96,13 @@ class TaskCreateViewModel: ObservableObject {
                          image: selectedImage != nil && isPhotoOn ? image!.jpegData(compressionQuality: 1.0) : nil,
                          link: URL(string: link)?.checkValidation(),
                          creationDate: plannedDate,
-                         notificationDate: isReminderOn ? reminderDate : nil)
+                         notificationDate: isReminderOn ? reminderDate : nil,
+                         addedToEvent: isAddToCalendar)
     }
     
     func scheduleNotificationIfNeeded(){
         guard isReminderOn else { return }
-        NotificationManager.shared.requestAuthorization { isAccessed in
+        notificationManager.requestAuthorization { isAccessed in
             if isAccessed {
                 NotificationManager.shared.scheduleNotification(
                     title: "Planned Notification",
@@ -122,10 +120,18 @@ class TaskCreateViewModel: ObservableObject {
         guard isAddToCalendar else { return }
         eventManager.addTaskToCalendar(createNewTask()) { isSaved, error in
             guard isSaved && error == nil else {
-                print("Failed to save event: \(String(describing: error?.localizedDescription))")
+                print("Failed to save event: \(String(describing: error?.localizedDescription))⛔️")
                 return
             }
             print("Event saved successfully✅")
+        }
+    }
+    
+    func openSettings(){
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
         }
     }
 }

@@ -10,15 +10,10 @@ import SwiftUI
 
 struct TaskCreateView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var viewModel: TaskCreateViewModel
+    @ObservedObject private var viewModel: TaskCreateViewModel
     
-    init(taskModel: TaskModel? = nil, onSave: @escaping (_ task: TaskModel) -> Void){
-        if let taskModel = taskModel {
-            viewModel = TaskCreateViewModel(taskModel: taskModel, isDataEdited: true)
-        } else {
-            let newTask = TaskModel(title: "", category: "", importance: .medium)
-            viewModel = TaskCreateViewModel(taskModel: newTask, isDataEdited: false)
-        }
+    init(viewModel: TaskCreateViewModel, onSave: @escaping (_ task: TaskModel) -> Void){
+        self.viewModel = viewModel
         self.onSave = onSave
     }
     
@@ -51,17 +46,25 @@ struct TaskCreateView: View {
                                 }
                             }
                             
+                            SectionView(title: "URL") {
+                                FormRowView(title: "") {
+                                    RowTextField(placeholder: "Link", text: $viewModel.link)
+                                }
+                            }
+                            
                             SectionView(title: "Dates") {
                                 FormRowView(title: "Planned date") {
-                                    DatePicker("", selection: $viewModel.plannedDate,displayedComponents: .date)
+                                    DatePicker("", selection: $viewModel.plannedDate)
                                         .labelsHidden()
                                         .datePickerStyle(.compact)
                                         .tint(.black)
                                 }
                                 FormRowView(title: "Reminder") {
                                     Toggle("", isOn: $viewModel.isReminderOn)
-                                        .labelsHidden()
                                         .tint(.black)
+                                        .onChange(of: viewModel.isReminderOn) { isOn, _ in
+                                            viewModel.toggleNotificationAccess(isOn: viewModel.isReminderOn)
+                                        }
                                 }
                                 if viewModel.isReminderOn {
                                     withAnimation(.easeInOut(duration: 2)) {
@@ -75,15 +78,15 @@ struct TaskCreateView: View {
                                 }
                             }
                             
-                            SectionView(title: "URL") {
-                                FormRowView(title: "") {
-                                    RowTextField(placeholder: "Link", text: $viewModel.link)
-                                }
-                            }
+                            
                             
                             SectionView(title: "Photo") {
                                 FormRowView(title: "Add Photo") {
+                                    
                                     Toggle("", isOn: $viewModel.isPhotoOn)
+                                        .onChange(of: viewModel.isPhotoOn) { isOn, _ in
+                                            viewModel.togglePhotoAccess(isOn: viewModel.isPhotoOn)
+                                        }
                                         .labelsHidden()
                                         .tint(.black)
                                 }
@@ -104,28 +107,38 @@ struct TaskCreateView: View {
                             
                             SectionView(title: "Calendar") {
                                 FormRowView(title: "Add task to Calendar") {
-                                    CalendarToggleView(isShowCalendar: $viewModel.isAddToCalendar, isSelectedInfo: $viewModel.showsSavingToCalendar)
+                                    HStack(alignment: .center, spacing: 10) {
+                                        Toggle("", isOn: $viewModel.isAddToCalendar)
+                                            .tint(.black)
+                                            .onChange(of: viewModel.isAddToCalendar) { isOn, _ in
+                                                viewModel.toggleCalendarAccess(isOn: isOn)
+                                            }
+                                        Button {
+                                            viewModel.showsSavingToCalendar = true
+                                        } label: {
+                                            Image(systemName: "info.circle")
+                                                .tint(.black)
+                                                .imageScale(.medium)
+                                        }
+                                    }
                                 }
                             }
                         }
-                        .disabled(!viewModel.isStartEditing && viewModel.isDataEdited)
                         HStack(spacing: 20) {
                             Button {
-                                onSave(viewModel.createNewTask())
-                                viewModel.addTaskToEvent()
-                                viewModel.scheduleNotificationIfNeeded()
-                                dismiss()
+                                saveNewTask()
                             } label: {
-                                Label(viewModel.buttonText, systemImage: "plus.circle.fill")
-                                    .imageScale(.large)
-                                    .tint(.black)
+                                Label("Save New Task", systemImage: "plus.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .tint(.silver)
                             }
-                            .frame(maxWidth: .infinity,alignment: .center)
-                            .frame(height: 50)
-                            .background(.silver)
-                            .clipShape(.rect(cornerRadius: 12))
+                            
+                            
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.roundedRectangle(radius: 12))
                             .padding(12)
-                            .opacity(viewModel.isStartEditing ? 1 : 0)
+                            .foregroundStyle(.aqua)
                         }
                     }
                     .toolbar {
@@ -138,17 +151,6 @@ struct TaskCreateView: View {
                                     .imageScale(.large)
                             }
                         }
-                        
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                viewModel.isStartEditing.toggle()
-                            } label: {
-                                Label("Edit", systemImage: "pencil.circle")
-                                    .tint(.aqua)
-                                    
-                            }
-                            .opacity(viewModel.isDataEdited ? 1 : 0)
-                        }
                     }
                     
                     
@@ -159,7 +161,7 @@ struct TaskCreateView: View {
                         CameraPickerView(selectedImage: $viewModel.selectedImage)
                     }
                     .navigationBarBackButtonHidden(true)
-                    .alert(viewModel.alertText, isPresented: $viewModel.showUnsavedChangesAlert) {
+                    .alert("You have some unsaved changes. Are you sure you want to leave?", isPresented: $viewModel.showUnsavedChangesAlert) {
                         Button("Leave anyway", role: .destructive) {
                             dismiss()
                         }
@@ -180,11 +182,48 @@ struct TaskCreateView: View {
                             .presentationCornerRadius(15)
                             .presentationDragIndicator(.visible)
                     }
+                    .alert("Enter the name for task if you want to save it", isPresented: $viewModel.showEmptyTitleAlert, actions: {
+                        Button("OK", role: .cancel) {}
+                    })
+                    
+                    .alert("Access for Photo denied. Need to allow access in settings", isPresented: $viewModel.showPhotoAlert) {
+                        Button("Go to settings") {
+                            viewModel.openSettings()
+                        }
+                        Button("Cancel",role: .cancel) {}
+                    }
+                    
+                    .alert("Access for Notification denied. Need to allow access in settings", isPresented: $viewModel.showNotificationAlert) {
+                        Button("Go to settings") {
+                            viewModel.openSettings()
+                        }
+                        Button("Cancel",role: .cancel) {}
+                    }
+                    
+                    .alert("Access for Calendar denied. Need to allow access in settings", isPresented: $viewModel.showEventAlert) {
+                        Button("Go to settings") {
+                            viewModel.openSettings()
+                        }
+                        Button("Cancel",role: .cancel) {}
+                    }
                 }
             }
         }
     }
+    
+    private func saveNewTask(){
+        if viewModel.title.isEmpty {
+            viewModel.showEmptyTitleAlert = true
+        } else {
+            onSave(viewModel.createNewTask())
+            viewModel.addTaskToEvent()
+            viewModel.scheduleNotificationIfNeeded()
+            dismiss()
+        }
+    }
+    
 }
+
 
 struct CalendarToggleView: View {
     @Binding var isShowCalendar: Bool
@@ -208,5 +247,6 @@ struct CalendarToggleView: View {
 
 
 #Preview {
-    TaskCreateView(taskModel: nil,onSave: { _ in })
+    let viewModel = TaskCreateViewModel()
+    TaskCreateView(viewModel: viewModel,onSave: { _ in })
 }

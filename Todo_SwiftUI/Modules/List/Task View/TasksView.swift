@@ -90,18 +90,19 @@ struct TasksView: View {
                     }
                 }
             }
-            .fullScreenCover(isPresented: $viewModel.showEditTaskCreateView, content: {
-                if let model = viewModel.selectedTask {
-                    TaskCreateView(taskModel: model) { task in
-                        viewModel.updateTask(task)
-                    }
-                    .transition(.slide.animation(.easeInOut))
-                }
-            })
+//            .fullScreenCover(isPresented: $viewModel.showEditTaskCreateView, content: {
+//                if let model = viewModel.selectedTask {
+//                    TaskCreateView() { task in
+//                        viewModel.updateTask(task)
+//                    }
+//                    .transition(.slide.animation(.easeInOut))
+//                }
+//            })
             
             .fullScreenCover(isPresented: $viewModel.showTaskCreateView) {
-                TaskCreateView { task in
-                    viewModel.addTask(task)
+                let viewModel = TaskCreateViewModel()
+                TaskCreateView(viewModel: viewModel) { task in
+                    self.viewModel.addTask(task)
                 }
                 .transition(.slide.animation(.easeInOut))
             }

@@ -13,6 +13,8 @@ class CalendarManager: NSObject {
     
     private let eventStore: EKEventStore = .init()
     
+    private override init(){}
+    
     func requestAccess(completion: @escaping (_ granted: Bool,_ error: Error?) -> Void){
         eventStore.requestWriteOnlyAccessToEvents { granted, error in
             DispatchQueue.main.async {

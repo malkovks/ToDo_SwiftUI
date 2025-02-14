@@ -9,29 +9,28 @@
 import SwiftUI
 import PhotosUI
 
-@MainActor
-final class PhotoLibraryManager: ObservableObject {
+final class PhotoLibraryManager: NSObject {
     static let shared = PhotoLibraryManager()
     
-    @Published var selectedImage: UIImage?
+//    @Published var selectedImage: UIImage?
     
-    private init() {}
-    
-    func saveImageTolibrary(_ image: UIImage, completion: @escaping (_ isSuccess: Bool) -> Void) {
-        checkAuthorizationStatus { isSuccess in
-            guard isSuccess else {
-                completion(false)
-                return
-            }
-            PHPhotoLibrary.shared().performChanges {
-                PHAssetChangeRequest.creationRequestForAsset(from: image)
-            } completionHandler: { isSuccessLoad, error in
-                DispatchQueue.main.async {
-                    completion(isSuccess && error == nil)
-                }
-            }
-        }
-    }
+    private override init() {}
+//    
+//    func saveImageTolibrary(_ image: UIImage, completion: @escaping (_ isSuccess: Bool) -> Void) {
+//        checkAuthorizationStatus { isSuccess in
+//            guard isSuccess else {
+//                completion(false)
+//                return
+//            }
+//            PHPhotoLibrary.shared().performChanges {
+//                PHAssetChangeRequest.creationRequestForAsset(from: image)
+//            } completionHandler: { isSuccessLoad, error in
+//                DispatchQueue.main.async {
+//                    completion(isSuccess && error == nil)
+//                }
+//            }
+//        }
+//    }
     
     func checkAuthorizationStatus(completion: @escaping (_ isSuccess: Bool) -> Void) {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)

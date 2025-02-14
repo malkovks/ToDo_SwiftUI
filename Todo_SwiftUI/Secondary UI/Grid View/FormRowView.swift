@@ -23,7 +23,6 @@ struct FormRowView<Content: View>: View {
                 .foregroundStyle(.black)
                 .font(.subheadline)
                 .padding(.leading,10)
-//                .frame(width: UIScreen.main.bounds.width / 2, alignment: .leading)
             Spacer()
             content
                 .frame(maxWidth: .infinity,alignment: .trailing)
