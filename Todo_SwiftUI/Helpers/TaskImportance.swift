@@ -57,4 +57,15 @@ enum TaskImportance: String,CaseIterable {
             return "exclamationmark"
         }
     }
+    
+    var tagImpornance: Int {
+        switch self {
+        case .high:
+            return 2
+        case .medium:
+            return 1
+        case .low:
+            return 0
+        }
+    }
 }

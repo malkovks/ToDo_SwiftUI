@@ -14,16 +14,53 @@ class TasksViewModel: ObservableObject {
     private let modelContext: ModelContext
     
     var tasks: [TaskModel] = []
+    var selectedFilter: TaskFilter = .all
+    var filteredTasks: [TaskModel] {
+        switch selectedFilter {
+        case .all:
+            return tasks
+        case .completed:
+            return tasks.filter { $0.isCompleted }
+        case .pending:
+            return tasks.filter { !$0.isCompleted }
+        }
+    }
     var isEditing: Bool = false
     var showingAlert: Bool = false
     var selectedTasks: Set<UUID> = []
     var selectedTask: TaskModel?
     var showTaskCreateView: Bool = false
     var showEditTaskCreateView: Bool = false
+    var showSettingsTaskView: Bool = false
     
     init(_ modelContext: ModelContext){
         self.modelContext = modelContext
         loadTasks()
+    }
+    
+    func sortTasks(by criteria: SortingType){
+        switch criteria {
+        case .byCreationDateAssending:
+            let _ = filteredTasks.sorted { $0.creationDate < $1.creationDate }
+        case .byCreationDateDescending:
+            let _ = filteredTasks.sorted { $0.creationDate > $1.creationDate }
+        case .byNotificationDateAssending:
+            let _ = filteredTasks.sorted {
+                guard let date1 = $0.notificationDate, let date2 = $1.notificationDate else {
+                    return false
+                }
+                return date1 < date2
+            }
+        case .byNotificationDateDescending:
+            let _ = filteredTasks.sorted {
+                guard let date1 = $0.notificationDate, let date2 = $1.notificationDate else {
+                    return false
+                }
+                return date1 > date2
+            }
+        case .byImportance:
+            let _ = filteredTasks.sorted { $0.importance.tagImpornance > $1.importance.tagImpornance }
+        }
     }
 
     func loadTasks(){
@@ -66,6 +103,14 @@ class TasksViewModel: ObservableObject {
             try? modelContext.save()
             self.loadTasks()
         }
+    }
+    
+    func deleteTask(with id: UUID){
+        guard let item = try? modelContext.fetch(FetchDescriptor<Item>()).first(where: { $0.id == id }) else { return }
+        modelContext.delete(item)
+        try? modelContext.save()
+        loadTasks()
+        print("delete successfully")
     }
     
     func deleteTasks(){
