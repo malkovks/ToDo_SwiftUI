@@ -19,35 +19,47 @@ struct SettingsTaskView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .top) {
+                GradientBackgroundView()
                 VStack {
                     
-                    Form {
-                        Section(header: Text("Columns count"),footer: Text(" Minimum 1, Maximum 4")) {
-                            Stepper("Columns count \(columnsCount)",value: $columnsCount, in: 1...4)
-                        }
-                        if columnsCount > 1 {
-                            Section(header: Text("Spacing between columns"),footer: Text(" Minimum 1, Maximum 30")) {
-                                Slider(value: $spacingSize, in: 1...30, step: 1)
+                        Form {
+                            Section(header: SettingsSectionHeaderView("Columns count"),
+                                    footer: SettingsSectionHeaderView(" Minimum 1, Maximum 4",opacity: 0.5)) {
+                                Stepper("Columns count \(columnsCount)",value: $columnsCount, in: 1...4)
                             }
-                        }
-                        
-                        Section(header: Text("Sorting Type")) {
-                            Toggle("Sorting enabled", isOn: $isSortingEnabled)
-                                .tint(.black)
-                            if isSortingEnabled {
-                                Picker("Sorting", selection: $sortingType) {
-                                    ForEach(SortingType.allCases, id: \.self) { type in
-                                        Text(type.title.capitalized)
+                            if columnsCount > 1 {
+                                Section(header: SettingsSectionHeaderView("Spacing between columns"),
+                                        footer: SettingsSectionHeaderView(" Minimum 1, Maximum 30",opacity: 0.5)) {
+                                    Text("Spacing between columns is \(Int(spacingSize))")
+                                    Slider(value: $spacingSize, in: 1...30, step: 1)
+                                        .tint(.black)
+                                        
+                                }
+                            }
+                            
+                            Section(header: SettingsSectionHeaderView("Sorting Type")) {
+                                Toggle("Sorting enabled", isOn: $isSortingEnabled)
+                                    .tint(.black)
+                                if isSortingEnabled {
+                                    Picker("Sorting", selection: $sortingType) {
+                                        ForEach(SortingType.allCases, id: \.self) { type in
+                                            Text(type.title.capitalized)
+                                        }
                                     }
                                 }
                             }
+                            
+                            Button {
+                                showReturnToDefault = true
+                            } label: {
+                                Label("Reset to default", systemImage: "arrow.clockwise.circle")
+                            }
                         }
-                        Button {
-                            showReturnToDefault = true
-                        } label: {
-                            Label("Reset to default", systemImage: "arrow.clockwise.circle")
-                        }
-                    }
+                        
+                        .listRowSeparator(.hidden)
+                        .padding(.horizontal, 10)
+                        .background(Color.clear)
+                        .scrollContentBackground(.hidden)
                 }
             }
         }

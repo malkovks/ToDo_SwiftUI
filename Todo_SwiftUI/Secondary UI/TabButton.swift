@@ -18,15 +18,16 @@ struct TabButton: View {
             }
         } label: {
             Image(systemName: tab.icon)
-                .font(.system(size: selectedTab == tab ? 26 : 24,weight: .bold))
+                .font(.system(size: selectedTab == tab ? 18 : 16,weight: .semibold))
+                .imageScale(.medium)
                 .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.7))
-                .frame(width: 50, height: 50)
+                .frame(width: 35, height: 35)
                 .padding()
                 .background(
                     selectedTab == tab ?
                     Circle()
                         .fill(Color.white.opacity(0.2))
-                        .frame(width: 60, height: 60)
+                        .frame(width: 40, height: 40)
                         .shadow(color: .black, radius: 5, x: 0, y: 3)
                     : nil
                     )

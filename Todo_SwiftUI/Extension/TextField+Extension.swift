@@ -17,12 +17,4 @@ extension View {
     }
 }
 
-extension URL {
-    func checkValidation() -> Self {
-        if !self.absoluteString.isEmpty, self.scheme == nil {
-            return URL(string: "https://\(self.absoluteString)")!
-        } else {
-            return self
-        }
-    }
-}
+

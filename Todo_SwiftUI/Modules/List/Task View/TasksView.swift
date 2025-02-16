@@ -8,34 +8,12 @@
 
 import SwiftUI
 
-enum SortingType: String, CaseIterable {
-    
-    case byCreationDateAssending
-    case byCreationDateDescending
-    case byNotificationDateAssending
-    case byNotificationDateDescending
-    case byImportance
-    
-    var title: String {
-        switch self {
-        case .byCreationDateAssending:
-            return "By Date assending"
-        case .byCreationDateDescending:
-            return "By Date descending"
-        case .byNotificationDateAssending:
-            return "By Notification date assending"
-        case .byNotificationDateDescending:
-            return "By Notification date descending"
-        case .byImportance:
-            return "By Importance"
-        }
-    }
-}
+
 
 struct TasksView: View {
     @Environment(\.modelContext) private var modelContext
     @State var viewModel: TasksViewModel
-    @Binding var isTabBarVisible: Bool
+//    @Binding var isTabBarVisible: Bool
     
     @State private var columnsCount: Int = 2
     @State private var spacingSize: CGFloat = 16
@@ -44,6 +22,12 @@ struct TasksView: View {
         didSet {
             isSortingEnable ? viewModel.sortTasks(by: sortingType) : ()
         }
+    }
+    
+    init(viewModel: TasksViewModel/*, isTabBarVisible: Binding<Bool>*/) {
+        self.viewModel = viewModel
+//        self.isTabBarVisible = isTabBarVisible
+        customSegmentControl()
     }
     
     private var columns: [GridItem] {
@@ -58,11 +42,7 @@ struct TasksView: View {
                 VStack(spacing: 10) {
                     TitleName(name: "Tasks")
                     if viewModel.tasks.isEmpty {
-                        VStack(alignment: .center) {
-                            Text("Press + to add new items")
-                                .font(.title)
-                                .foregroundStyle(.silver)
-                        }
+                        AlertView("Press + to add new items")
                     } else {
                         ScrollView {
                             Picker("Filter",selection: $viewModel.selectedFilter) {
@@ -101,6 +81,7 @@ struct TasksView: View {
             }
             .toolbarVisibility(.hidden, for: .tabBar)
             .toolbarRole(.editor)
+            
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -110,9 +91,8 @@ struct TasksView: View {
                     } label: {
                         Image(systemName: viewModel.isEditing ? "checkmark.circle" : "pencil.circle")
                             .fontWeight(.regular)
-                            .foregroundStyle(.silver)
-                            .frame(maxWidth: .infinity,alignment: .leading)
-                            .padding(.horizontal)
+                            .tint(.silver)
+                            .opacity(viewModel.tasks.isEmpty ? 0 : 1)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -122,7 +102,7 @@ struct TasksView: View {
                         Image(systemName: "gear.badge")
                             .tint(.silver)
                             .fontWeight(.regular)
-                            .font(.system(size: 24))
+                            .opacity(viewModel.filteredTasks.isEmpty ? 0 : 1)
                     }
                 }
                 
@@ -134,7 +114,6 @@ struct TasksView: View {
                         Image(systemName: viewModel.isEditing ? "trash" : "plus")
                             .tint(viewModel.isEditing ? .red : .silver)
                             .fontWeight(.regular)
-                            .font(.system(size: 24))
                     }
                     .disabled(viewModel.isEditing ? viewModel.selectedTasks.isEmpty : false)
                 }
@@ -165,9 +144,6 @@ struct TasksView: View {
                 }
                 .transition(.slide.animation(.easeInOut))
             }
-        }
-        .onAppear {
-            isTabBarVisible = true
         }
     }
 }

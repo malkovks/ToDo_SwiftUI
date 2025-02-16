@@ -13,7 +13,7 @@ enum TaskImportance: String,CaseIterable {
     case high, medium, low
     
     init?(rawValue: String) {
-        switch rawValue {
+        switch rawValue.capitalized {
         case "High":
             self = .high
         case "Medium":

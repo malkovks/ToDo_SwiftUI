@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftData
-import CoreLocation
 
 @Model
 final class Item {
@@ -19,7 +18,8 @@ final class Item {
     var isCompleted: Bool = false
     var image: Data? = nil
     var link: URL? = nil
-    var creationDate: Date = Date()
+    var creationDate: Date
+    var plannedCompleteDate: Date = Date()
     var notificationDate: Date? = nil
     var addedToEvent: Bool = false
     
@@ -32,6 +32,7 @@ final class Item {
         self.image = taskModel.image
         self.link = taskModel.link
         self.creationDate = taskModel.creationDate
+        self.plannedCompleteDate = taskModel.plannedCompleteDate
         self.notificationDate = taskModel.notificationDate
         self.addedToEvent = taskModel.addedToEvent
     }

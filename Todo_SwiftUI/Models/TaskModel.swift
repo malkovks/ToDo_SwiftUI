@@ -6,7 +6,6 @@
 // Copyright (c) 2024 Malkov Konstantin . All rights reserved.
 
 import SwiftUI
-import CoreLocation
 
 struct TaskModel: Identifiable {
     var id: UUID = UUID()
@@ -16,8 +15,8 @@ struct TaskModel: Identifiable {
     var isCompleted: Bool = false
     var image: Data? = nil
     var link: URL? = nil
-    var place: CLLocationCoordinate2D? = nil
     var creationDate: Date = Date()
+    var plannedCompleteDate: Date = Date()
     var notificationDate: Date? = nil
     var addedToEvent: Bool = false
     
@@ -27,7 +26,6 @@ struct TaskModel: Identifiable {
           isCompleted: Bool = false,
           image: Data? = nil,
           link: URL? = nil,
-          place: CLLocationCoordinate2D? = nil,
           creationDate: Date = Date(),
           notificationDate: Date? = nil,
           addedToEvent: Bool = false
@@ -38,8 +36,7 @@ struct TaskModel: Identifiable {
         self.isCompleted = isCompleted
         self.image = image
         self.link = link
-        self.place = place
-        self.creationDate = creationDate
+        self.plannedCompleteDate = creationDate
         self.notificationDate = notificationDate
         self.addedToEvent = addedToEvent
     }
@@ -53,6 +50,7 @@ struct TaskModel: Identifiable {
         self.image = taskModel.image
         self.link = taskModel.link
         self.creationDate = taskModel.creationDate
+        self.plannedCompleteDate = taskModel.plannedCompleteDate
         self.notificationDate = taskModel.notificationDate
         self.addedToEvent = taskModel.addedToEvent
     }

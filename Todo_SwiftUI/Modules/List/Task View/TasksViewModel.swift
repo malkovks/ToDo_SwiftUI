@@ -41,9 +41,9 @@ class TasksViewModel: ObservableObject {
     func sortTasks(by criteria: SortingType){
         switch criteria {
         case .byCreationDateAssending:
-            let _ = filteredTasks.sorted { $0.creationDate < $1.creationDate }
+            let _ = filteredTasks.sorted { $0.plannedCompleteDate < $1.plannedCompleteDate }
         case .byCreationDateDescending:
-            let _ = filteredTasks.sorted { $0.creationDate > $1.creationDate }
+            let _ = filteredTasks.sorted { $0.plannedCompleteDate > $1.plannedCompleteDate }
         case .byNotificationDateAssending:
             let _ = filteredTasks.sorted {
                 guard let date1 = $0.notificationDate, let date2 = $1.notificationDate else {
@@ -97,7 +97,7 @@ class TasksViewModel: ObservableObject {
             existedTask.isCompleted = task.isCompleted
             existedTask.image = task.image
             existedTask.link = task.link
-            existedTask.creationDate = task.creationDate
+            existedTask.plannedCompleteDate = task.plannedCompleteDate
             existedTask.notificationDate = task.notificationDate
             
             try? modelContext.save()

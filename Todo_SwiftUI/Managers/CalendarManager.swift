@@ -33,8 +33,8 @@ class CalendarManager: NSObject {
         }
         let event = EKEvent(eventStore: eventStore)
         event.title = task.title
-        event.startDate = task.creationDate
-        event.endDate = task.notificationDate ?? task.creationDate.addingTimeInterval(3660)
+        event.startDate = task.plannedCompleteDate
+        event.endDate = task.notificationDate ?? task.plannedCompleteDate.addingTimeInterval(3660)
         event.availability = .free
         event.url = task.link
         

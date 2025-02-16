@@ -14,3 +14,14 @@ struct GradientBackgroundView: View {
             .edgesIgnoringSafeArea(.all)
     }
 }
+
+struct GradientBackgroundModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        ZStack {
+            Color.iron.ignoresSafeArea(.all)
+            LinearGradient(colors: [.black.opacity(1),.black.opacity(0.8),.black.opacity(0.6),.black.opacity(0.4),.black.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
+            content
+        }
+    }
+}

@@ -23,8 +23,8 @@ struct MainTabView: View {
     var body: some View {
         ZStack(alignment: .bottom, content: {
             TabView(selection: $selectedTab) {
-                TasksView(viewModel: TasksViewModel(sharedModelContainer.mainContext), isTabBarVisible: $isTabBarVisible).tag(Tab.tasks)
-                StatisticsView().tag(Tab.statistics)
+                TasksView(viewModel: TasksViewModel(sharedModelContainer.mainContext)/*, isTabBarVisible: $isTabBarVisible*/).tag(Tab.tasks)
+                StatisticsView(StatisticsViewModel(context: sharedModelContainer.mainContext)).tag(Tab.statistics)
                 SettingsView().tag(Tab.settings)
             }
             .modelContainer(sharedModelContainer)
@@ -38,13 +38,8 @@ struct MainTabView: View {
                     }
                 }
                 .padding(.horizontal,20)
-                .padding(.vertical,10)
-                .background(
-                    LinearGradient(gradient: Gradient(colors: [.midnight,.ocean]), startPoint: .leading, endPoint: .trailing)
-                        .clipShape(.capsule)
-                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                )
-                .padding(.bottom,10)
+                .background(.ocean)
+                .clipShape(Capsule())
             }
             
             
