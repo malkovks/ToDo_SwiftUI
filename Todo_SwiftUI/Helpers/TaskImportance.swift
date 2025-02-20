@@ -10,7 +10,7 @@ import SwiftUI
 enum TaskImportance: String,CaseIterable {
     var id: Self { self }
     
-    case high, medium, low
+    case high = "High", medium = "Medium", low = "Low"
     
     init?(rawValue: String) {
         switch rawValue.capitalized {

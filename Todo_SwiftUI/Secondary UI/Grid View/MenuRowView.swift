@@ -27,12 +27,12 @@ struct MenuRowView: View {
                 HStack {
                     Text(importance.title)
                     Image(systemName: "info.circle")
-                        .tint(.black)
+                        .tint(.text)
                         .scaledToFit()
                         .frame(width: 30, height: 30)
 
                 }
-                .tint(.black)
+                .tint(.text)
                 .imageScale(.small)
             }
         }

@@ -22,8 +22,8 @@ struct RowTextField: View {
             VStack {
                 TextField(placeholder, text: $text)
                     .font(.title3)
-                    .foregroundColor(.black)
-                    .tint(.black)
+                    .foregroundColor(.text)
+                    .tint(.text)
                     .multilineTextAlignment(.trailing)
                     .padding(.horizontal)
                     .keyboardType(.asciiCapable)

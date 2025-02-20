@@ -17,6 +17,6 @@ extension View {
         UISegmentedControl.appearance().backgroundColor = .ocean
         UISegmentedControl.appearance().selectedSegmentTintColor = .silver
         UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor(Color.silver)], for: .normal)
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor(Color.black)], for: .selected)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor(Color.text)], for: .selected)
     }
 }

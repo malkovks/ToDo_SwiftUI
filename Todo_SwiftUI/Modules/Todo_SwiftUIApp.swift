@@ -11,11 +11,23 @@ import SwiftData
 
 @main
 struct Todo_SwiftUIApp: App {
+    
+    @AppStorage("appBackground") var background: String = "Light"
 
     var body: some Scene {
         WindowGroup {
             LoaderView()
-                .colorScheme(.light)
+                .preferredColorScheme(confirmStyle())
+        }
+    }
+    
+    private func confirmStyle() -> ColorScheme? {
+        switch background{
+        case "Light": return .light
+        case "Dark" : return .dark
+        case "Custom" : return .none
+        default:
+            return .none
         }
     }
 }

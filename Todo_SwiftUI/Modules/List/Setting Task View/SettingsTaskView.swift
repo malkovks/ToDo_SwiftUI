@@ -32,14 +32,14 @@ struct SettingsTaskView: View {
                                         footer: SettingsSectionHeaderView(" Minimum 1, Maximum 30",opacity: 0.5)) {
                                     Text("Spacing between columns is \(Int(spacingSize))")
                                     Slider(value: $spacingSize, in: 1...30, step: 1)
-                                        .tint(.black)
+                                        .tint(.text)
                                         
                                 }
                             }
                             
                             Section(header: SettingsSectionHeaderView("Sorting Type")) {
                                 Toggle("Sorting enabled", isOn: $isSortingEnabled)
-                                    .tint(.black)
+                                    .tint(.text)
                                 if isSortingEnabled {
                                     Picker("Sorting", selection: $sortingType) {
                                         ForEach(SortingType.allCases, id: \.self) { type in

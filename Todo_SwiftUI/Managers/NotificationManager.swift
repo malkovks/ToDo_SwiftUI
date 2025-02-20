@@ -26,7 +26,14 @@ final class NotificationManager: NSObject {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
-        content.sound = .defaultRingtone
+        
+        let soundName = UserDefaults.standard.string(forKey: "notificationSound") ?? "Default"
+        
+        if soundName == "Default" {
+            content.sound = .default
+        } else {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(configureSoundName(key: soundName)))
+        }
         
         let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute,.second], from: date)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
@@ -36,6 +43,22 @@ final class NotificationManager: NSObject {
             DispatchQueue.main.async {
                 completion?(error != nil)
             }
+        }
+    }
+    
+    
+    private func configureSoundName(key: String) -> String {
+        switch key {
+        case "Sound 1" :
+            return "mixkit-confirmation-tone-2867.wav"
+        case "Sound 2":
+            return "mixkit-correct-answer-tone-2870.wav"
+        case "Sound 3":
+            return "mixkit-message-pop-alert-2354.wav"
+        case "Sound 4":
+            return "mixkit-software-interface-start-2574.wav"
+        default:
+            return "Default"
         }
     }
 }

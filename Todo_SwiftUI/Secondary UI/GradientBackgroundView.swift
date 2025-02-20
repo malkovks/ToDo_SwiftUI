@@ -10,7 +10,7 @@ import SwiftUI
 struct GradientBackgroundView: View {
     var body: some View {
         Color.iron.ignoresSafeArea(.all)
-        LinearGradient(colors: [.black.opacity(1),.black.opacity(0.8),.black.opacity(0.6),.black.opacity(0.4),.black.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
+        LinearGradient(colors: [.text.opacity(1),.text.opacity(0.8),.text.opacity(0.6),.text.opacity(0.4),.text.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
             .edgesIgnoringSafeArea(.all)
     }
 }
@@ -19,7 +19,7 @@ struct GradientBackgroundModifier: ViewModifier {
     func body(content: Content) -> some View {
         ZStack {
             Color.iron.ignoresSafeArea(.all)
-            LinearGradient(colors: [.black.opacity(1),.black.opacity(0.8),.black.opacity(0.6),.black.opacity(0.4),.black.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [.text.opacity(1),.text.opacity(0.8),.text.opacity(0.6),.text.opacity(0.4),.text.opacity(0.2),.clear], startPoint: .top, endPoint: .bottom)
                 .edgesIgnoringSafeArea(.all)
             content
         }

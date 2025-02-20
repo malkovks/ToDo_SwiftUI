@@ -28,7 +28,7 @@ struct TabButton: View {
                     Circle()
                         .fill(Color.white.opacity(0.2))
                         .frame(width: 40, height: 40)
-                        .shadow(color: .black, radius: 5, x: 0, y: 3)
+                        .shadow(color: .text, radius: 5, x: 0, y: 3)
                     : nil
                     )
                 .scaleEffect(selectedTab == tab ? 1.2 : 1)

@@ -20,7 +20,7 @@ struct FormRowView<Content: View>: View {
     var body: some View {
         HStack(alignment: .center,spacing: 5) {
             Text(title)
-                .foregroundStyle(.black)
+                .foregroundStyle(.text)
                 .font(.subheadline)
                 .padding(.leading,10)
             Spacer()

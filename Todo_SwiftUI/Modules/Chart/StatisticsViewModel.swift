@@ -43,6 +43,19 @@ class StatisticsViewModel: ObservableObject {
         }
     }
     
+    func loadPriorityData() -> [TaskPriorityData] {
+        do {
+            let fetchResult = try context.fetch(FetchDescriptor<Item>())
+            return TaskImportance.allCases.map { priority in
+                let count = fetchResult.filter { $0.importance == priority.rawValue }.count
+                return TaskPriorityData(title: priority, color: priority.color, count: count)
+            }
+        } catch {
+            print("Cant load Items count")
+            return []
+        }
+    }
+    
     func sortByPriority(_ taskPriority: TaskImportance?){
         do {
             var fetchDescriptor = FetchDescriptor<Item>()

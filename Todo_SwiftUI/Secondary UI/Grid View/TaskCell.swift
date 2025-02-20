@@ -22,7 +22,7 @@ struct TaskCell: View {
             
             Text(task.category)
                 .font(.subheadline)
-                .foregroundStyle(.black)
+                .foregroundStyle(.text)
             Rectangle()
                 .frame(height: 6)
                 .clipShape(.rect(cornerRadius: 3))

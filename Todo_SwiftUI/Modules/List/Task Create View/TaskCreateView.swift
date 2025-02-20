@@ -57,11 +57,11 @@ struct TaskCreateView: View {
                                     DatePicker("", selection: $viewModel.plannedDate)
                                         .labelsHidden()
                                         .datePickerStyle(.compact)
-                                        .tint(.black)
+                                        .tint(.text)
                                 }
                                 FormRowView(title: "Reminder") {
                                     Toggle("", isOn: $viewModel.isReminderOn)
-                                        .tint(.black)
+                                        .tint(.text)
                                         .onChange(of: viewModel.isReminderOn) { isOn, _ in
                                             viewModel.toggleNotificationAccess(isOn: viewModel.isReminderOn)
                                         }
@@ -72,7 +72,7 @@ struct TaskCreateView: View {
                                             DatePicker("", selection: $viewModel.reminderDate, in: Date()...)
                                                 .labelsHidden()
                                                 .datePickerStyle(.compact)
-                                                .tint(.black)
+                                                .tint(.text)
                                         }
                                     }
                                 }
@@ -88,7 +88,7 @@ struct TaskCreateView: View {
                                             viewModel.togglePhotoAccess(isOn: viewModel.isPhotoOn)
                                         }
                                         .labelsHidden()
-                                        .tint(.black)
+                                        .tint(.text)
                                 }
                                 if viewModel.isPhotoOn {
                                     withAnimation(.easeInOut(duration: 2)) {
@@ -97,7 +97,7 @@ struct TaskCreateView: View {
                                                 viewModel.showTypesImages = true
                                             } label: {
                                                 Image(systemName: "photo.on.rectangle.fill")
-                                                    .tint(.black)
+                                                    .tint(.text)
                                             }
                                         }
                                     }
@@ -109,7 +109,7 @@ struct TaskCreateView: View {
                                 FormRowView(title: "Add task to Calendar") {
                                     HStack(alignment: .center, spacing: 10) {
                                         Toggle("", isOn: $viewModel.isAddToCalendar)
-                                            .tint(.black)
+                                            .tint(.text)
                                             .onChange(of: viewModel.isAddToCalendar) { isOn, _ in
                                                 viewModel.toggleCalendarAccess(isOn: isOn)
                                             }
@@ -117,7 +117,7 @@ struct TaskCreateView: View {
                                             viewModel.showsSavingToCalendar = true
                                         } label: {
                                             Image(systemName: "info.circle")
-                                                .tint(.black)
+                                                .tint(.text)
                                                 .imageScale(.medium)
                                         }
                                     }
@@ -233,12 +233,12 @@ struct CalendarToggleView: View {
         HStack(alignment: .center, spacing: 10) {
             Toggle("", isOn: $isShowCalendar)
                 .labelsHidden()
-                .tint(.black)
+                .tint(.text)
             Button {
                 isSelectedInfo.toggle()
             } label: {
                 Image(systemName: "info.circle")
-                    .tint(.black)
+                    .tint(.text)
                     .imageScale(.medium)
             }
         }

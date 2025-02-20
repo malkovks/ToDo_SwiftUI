@@ -12,7 +12,7 @@ struct InformationView: View {
         ZStack {
             Text("This function appears you to add created task into your Calendar application it it necessary")
                 .font(.largeTitle)
-                .foregroundStyle(.black)
+                .foregroundStyle(.text)
                 .padding(.horizontal, 10)
                 .multilineTextAlignment(.center)
         }
